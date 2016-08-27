@@ -7,6 +7,7 @@ library(ggplot2)
 library(plotly)
 library(scales)
 
+source("packages.R")
 source("functions.R")
 
 # Define server logic required to summarize and view the selected
