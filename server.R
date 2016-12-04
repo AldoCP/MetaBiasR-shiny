@@ -21,6 +21,7 @@ shinyServer(function(input, output) {
   #  2) The computation and result are shared by all the callers 
   #	  (it only executes a single time)
   #
+if(FALSE){#comment block
   datasetInput <- reactive({
     switch(input$dataset,
            "bangertdrowns2004" = get(data(dat.bangertdrowns2004)),
@@ -29,6 +30,17 @@ shinyServer(function(input, output) {
            "raudenbush1985" = get(data(dat.raudenbush1985))
 	)
   })
+}
+
+
+  datasetInput <- reactive({
+    inFile <- input$file1
+    if (is.null(inFile)) return(get(data(dat.bangertdrowns2004)))
+    data <- read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote)
+    data
+  })
+
+
   
   # The output$caption is computed based on a reactive expression
   # that returns input$caption. When the user changes the
@@ -52,13 +64,13 @@ shinyServer(function(input, output) {
   # (i.e. whenever the input$dataset changes)
   output$summary <- renderPrint({
     dataset <- datasetInput()
-    ans <- BFbias(dataset$yi, sqrt(dataset$vi)); names(ans) <- "Bayes Factor"
+    ans <- BFbias(dataset$yi, sqrt(dataset$vi), alpha=input$Alpha, beta=input$Beta); names(ans) <- "Bayes Factor"
     ans
   })
 
   output$plot1 <- renderPlotly({
     dataset <- datasetInput()
-    p <- ggplotly(plotBFbias(dataset$yi, sqrt(dataset$vi)))
+    p <- ggplotly(plotBFbias(y=dataset$yi, sig=sqrt(dataset$vi), alpha=input$Alpha, beta=input$Beta))
 #    p  
 	})
 
@@ -75,13 +87,13 @@ shinyServer(function(input, output) {
 
   output$plot2 <- renderPlotly({
     dataset <- datasetInput()
-    pl <- ggplotly(plotL(dataset$yi, sqrt(dataset$vi)))
+    pl <- ggplotly(plotL(y=dataset$yi, sig=sqrt(dataset$vi), alpha=input$Alpha, beta=input$Beta))
 #    pl  
 	})
 
 
   output$view <- renderTable({
-    head(datasetInput(), n = input$obs)
+    datasetInput()#head(datasetInput(), n = 5)#input$obs)
   })
 })
 

@@ -5,39 +5,86 @@ library(plotly)
 shinyUI(pageWithSidebar(
 
   # Application title
-  headerPanel("Publication bias analysis"),
+  headerPanel("MetaBias"),
 
-  # Sidebar with controls to provide a caption, select a dataset, and 
-  # specify the number of observations to view. Note that changes made
-  # to the caption in the textInput control are updated in the output
-  # area immediately as you type
+if(FALSE){ #comment this section
   sidebarPanel(
     textInput("caption", "Caption:", "[Custom name]"),
-
-    selectInput("dataset", "Choose a metafor dataset:", 
+    selectInput("dataset", "...Or choose an example dataset from metafor:", 
                 choices = c("raudenbush1985", "bangertdrowns2004", "hackshaw1998", "konstantopoulos2011")),
+    numericInput("obs", "Max. num. of observations displayed in table:", 10),
+      sliderInput("Alpha", 
+        label = "Alpha (Beta distribution)",
+        min = 0, max = 5, value = 1, step=0.01),
+      sliderInput("Beta", 
+        label = "Beta (Beta distribution)",
+        min = 0, max = 5, value = 1, step=0.01)
+             )
+},
 
-    numericInput("obs", "Max. num. of observations displayed in table:", 10)
-  ),
+  sidebarLayout(
+    sidebarPanel(
+      fileInput('file1', 'Choose file to upload',
+                accept = c(
+                  'text/csv',
+                  'text/comma-separated-values',
+                  'text/tab-separated-values',
+                  'text/plain',
+                  '.csv',
+                  '.tsv'
+                )
+      ),
+      tags$hr(),
+      checkboxInput('header', 'Header', TRUE),
+      radioButtons('sep', 'Separator',
+                   c(Comma=',',
+                     Semicolon=';',
+                     Tab='\t'),
+                   '\t'),
+      radioButtons('quote', 'Quote',
+                   c(None='',
+                     'Double Quote'='"',
+                     'Single Quote'="'"),
+                   ''),
+      tags$hr(),
+      p('If you want a sample .csv or .tsv file to upload,',
+        'you can first download the sample',
+        a(href = 'raudenbush1985.csv', 'raudenbush1985.csv'),
+        'files, and then try uploading them.'),
+
+      tags$hr(),
+      sliderInput("Alpha", 
+        label = "Alpha (Beta distribution)",
+        min = 0, max = 5, value = 1, step=0.01),
+      sliderInput("Beta", 
+        label = "Beta (Beta distribution)",
+        min = 0, max = 5, value = 1, step=0.01)
+
+    ),
 
 
   # Show the caption, a summary of the dataset and an HTML table with
   # the requested number of observations
   mainPanel(
-    h3(textOutput("caption")), 
 
-    verbatimTextOutput("summary"), 
+##    h3(textOutput("caption")), 
+##    verbatimTextOutput("summary"), 
+##    plotlyOutput("plot1"), 
+###    plotOutput("plot1"), 
+###    tabsetPanel(tabPanel("Plot1", plotlyOutput("plot1"))),
+###    tabsetPanel(tabPanel("Plot1", plotOutput("plot1"))),
+##    plotlyOutput("plot2"), 
+##    tableOutput("view")
 
-    plotlyOutput("plot1"), 
-#    plotOutput("plot1"), 
+      tabsetPanel(
+#        tabPanel("Caption", h3(textOutput("caption"))), 
+        tabPanel("Bayes factor", verbatimTextOutput("summary")), 
+        tabPanel("BF vs sigma prior", plotlyOutput("plot1")),
+        tabPanel("Likelihood", plotlyOutput("plot2")),
+        tabPanel("Data", tableOutput("view"))
+                 )
 
-#    tabsetPanel(tabPanel("Plot1", plotlyOutput("plot1"))),
-#    tabsetPanel(tabPanel("Plot1", plotOutput("plot1"))),
-
-    plotlyOutput("plot2"), 
-
-
-    tableOutput("view")
   )
 ))
+)
 
