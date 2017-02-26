@@ -98,14 +98,17 @@ pl <- ggplot(results, aes(x=mu_value, y=eta_value, z=L, fill=L)) + geom_tile() +
 
 enhfun <- function(){
 
-layout(matrix(1:2, ncol = 1), widths = 1, heights = c(2,1.5), respect = FALSE)
+x <- dat.bangertdrowns2004$yi
+y <- dat.bangertdrowns2004$vi
+
+layout(matrix(1:2, ncol = 1), widths = 1, heights = c(2,2), respect = FALSE)
 par(mar = c(0, 4.1, 4.1, 2.1))
-plot(dat.bangertdrowns2004$yi, dat.bangertdrowns2004$vi)
+plot(x, sqrt(y), xlim=range(x)*1.75, ylim=c(max(sqrt(y)),0))#/dat.bangertdrowns2004$vi )
 par(mar = c(4.1, 4.1, 0, 2.1))
-funnel(rma(yi=dat.bangertdrowns2004$yi, vi=dat.bangertdrowns2004$vi), level=c(90, 95, 99), shade=c("white", "gray", "darkgray"), refline=0)
+funnel(rma(yi=x, vi=y), level=c(90, 95, 99), shade=c("white", "gray", "darkgray"), refline=0, xlim=range(x)*1.75, ylim=c(max(sqrt(y)),0))
 
 
 }
-
+enhfun()
 
 
