@@ -64,31 +64,44 @@ if(FALSE){#comment block
   # (i.e. whenever the input$dataset changes)
   output$summary <- renderPrint({
     dataset <- datasetInput()
-    ans <- BFbias(dataset$yi, sqrt(dataset$vi), alpha=input$Alpha, beta=input$Beta); names(ans) <- "Bayes Factor"
+#    ans <- BFbias(dataset$yi, sqrt(dataset$vi), alpha=input$Alpha, beta=input$Beta); names(ans) <- "Bayes Factor"
+    ans <- BFbias(dataset$yi, sqrt(dataset$vi)); names(ans) <- "Bayes Factor"
     ans
   })
 
   output$plot1 <- renderPlotly({
     dataset <- datasetInput()
-    p <- ggplotly(plotBFbias(y=dataset$yi, sig=sqrt(dataset$vi), alpha=input$Alpha, beta=input$Beta))
-#    p  
+#    p <- ggplotly(plotBFbias(y=dataset$yi, sig=sqrt(dataset$vi), alpha=input$Alpha, beta=input$Beta))
+    p <- ggplotly(plotBFbias(y=dataset$yi, sig=sqrt(dataset$vi)))
+#    print(p)  
 	})
 
-#  output$plot1 <- renderPlot({
-#    dataset <- datasetInput()
-#    p <- plotBFbias(dataset$yi, sqrt(dataset$vi))
-#	print(p)  })
 
+if(FALSE){
+  output$plot1 <- renderPlot({
+    dataset <- datasetInput()
+    p <- plotBFbias(dataset$yi, sqrt(dataset$vi))
+	print(p)  })
+}
   
   # The output$view depends on both the databaseInput reactive
   # expression and input$obs, so will be re-executed whenever
   # input$dataset or input$obs is changed. 
 
-
+if(FALSE){
   output$plot2 <- renderPlotly({
     dataset <- datasetInput()
     pl <- ggplotly(plotL(y=dataset$yi, sig=sqrt(dataset$vi), alpha=input$Alpha, beta=input$Beta))
 #    pl  
+	})
+}
+
+  output$plot2 <- renderPlotly({
+    dataset <- datasetInput()
+#    pl <- (plotL(y=dataset$yi, sig=sqrt(dataset$vi), alpha=input$Alpha, beta=input$Beta))
+    pl <- ggplotly(plotL(y=dataset$yi, sig=sqrt(dataset$vi)))
+#    print(pl)  
+#    pl
 	})
 
 

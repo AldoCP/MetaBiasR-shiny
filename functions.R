@@ -7,15 +7,15 @@ function(mu, y, sig, sig_prior=2){
   (-(a*(mu**2) + b*mu + c)) }
 
 logL <-
-#function(mu, eta, y, sig, sig_prior=2, Z=1.96){
-function(mu, eta, y, sig, sig_prior=2, Z=1.96, alpha=5, beta=5){#added alpha and beta
+function(mu, eta, y, sig, sig_prior=2, Z=1.96){
+#function(mu, eta, y, sig, sig_prior=2, Z=1.96, alpha=5, beta=5){#added alpha and beta
   logdensity <- logL0(mu=mu, y=y, sig=sig, sig_prior=sig_prior)
   SS <- (abs(y) - sig*Z) > 0 #SS: Statistically significant
 norm_f <- function(mu, sig, Z=Z) {1/(1 -pnorm(sig*Z, mean=mu, sd=sig) +pnorm(-sig*Z, mean=mu, sd=sig))}# Normalization constant: f(sig)
   f <- norm_f(mu=mu, sig=sig[SS], Z=Z)
   modif <- sum(log(eta + (1-eta)*f )) + sum(SS==F)*log(eta)
-#  logdensity + modif}
-  logdensity + modif + dbeta(mu, alpha, beta)} #added dbeta
+  logdensity + modif}
+#  logdensity + modif + dbeta(mu, alpha, beta)} #added dbeta
 
 nullmass <-
 function(y, sig, sig_prior=2){
@@ -29,10 +29,10 @@ sig_ <- sqrt(var_)
   ans}
 
 mass <-
-#function(y, sig, sig_prior=2, Z=1.96){
-function(y, sig, sig_prior=2, Z=1.96, alpha=5, beta=5){
-#  Fn <- function(arg1, arg2) exp(logL(arg1, arg2, y=y, sig=sig, sig_prior=sig_prior, Z=Z))
-  Fn <- function(arg1, arg2) exp(logL(arg1, arg2, y=y, sig=sig, sig_prior=sig_prior, Z=Z, alpha=alpha, beta=beta))
+function(y, sig, sig_prior=2, Z=1.96){
+#function(y, sig, sig_prior=2, Z=1.96, alpha=5, beta=5){
+  Fn <- function(arg1, arg2) exp(logL(arg1, arg2, y=y, sig=sig, sig_prior=sig_prior, Z=Z))
+#  Fn <- function(arg1, arg2) exp(logL(arg1, arg2, y=y, sig=sig, sig_prior=sig_prior, Z=Z, alpha=alpha, beta=beta))
   Fn2 <- function(x) Fn(x[1], x[2])#"arg1" stands for "mu"; "arg2" stands for "eta"
 a <- 0.5 * (sum(1/sig**2) + 1/sig_prior**2)
 b <- -sum(y/sig**2)
@@ -43,20 +43,20 @@ sig_ <- sqrt(var_)
   ans}
 
 BFbias <-
-#function(y, sig, sig_prior=2, Z=1.96){
-function(y, sig, sig_prior=2, Z=1.96, alpha=5, beta=5){
-ans <- mass(y, sig, sig_prior=sig_prior, Z=Z, alpha=alpha, beta=alpha)/nullmass(y, sig, sig_prior=sig_prior)
-#ans <- mass(y, sig, sig_prior=sig_prior, Z=Z)/nullmass(y, sig, sig_prior=sig_prior)
+function(y, sig, sig_prior=2, Z=1.96){
+#function(y, sig, sig_prior=2, Z=1.96, alpha=5, beta=5){
+#ans <- mass(y, sig, sig_prior=sig_prior, Z=Z, alpha=alpha, beta=alpha)/nullmass(y, sig, sig_prior=sig_prior)
+ans <- mass(y, sig, sig_prior=sig_prior, Z=Z)/nullmass(y, sig, sig_prior=sig_prior)
 ans}
 
 
-#plotBFbias <- function(y, sig, sig_prior_min=1e-2, sig_prior_max=1e2, Z=1.96){
-plotBFbias <- function(y, sig, sig_prior_min=1e-2, sig_prior_max=1e2, Z=1.96, alpha=5, beta=5){
+plotBFbias <- function(y, sig, sig_prior_min=1e-2, sig_prior_max=1e2, Z=1.96){
+#plotBFbias <- function(y, sig, sig_prior_min=1e-2, sig_prior_max=1e2, Z=1.96, alpha=5, beta=5){
 	sigma_prior <- exp(seq(log(sig_prior_min), log(sig_prior_max), length.out = 40))
 #	print("Generating datapoints...");flush.console()
 	BF <- rep(NA, length(sigma_prior))
-#	for(x in seq_len(length(sigma_prior))) BF[x] <- BFbias(y, sig, sig_prior=sigma_prior[x], Z=Z)
-	for(x in seq_len(length(sigma_prior))) BF[x] <- BFbias(y, sig, sig_prior=sigma_prior[x], Z=Z, alpha=alpha, beta=beta)
+	for(x in seq_len(length(sigma_prior))) BF[x] <- BFbias(y, sig, sig_prior=sigma_prior[x], Z=Z)
+#	for(x in seq_len(length(sigma_prior))) BF[x] <- BFbias(y, sig, sig_prior=sigma_prior[x], Z=Z, alpha=alpha, beta=beta)
 	df <- as.data.frame(cbind(sigma_prior, BF))
 #	print("Plotting...");flush.console()
 plot0 <- ggplot(df, aes(sigma_prior, BF)) + geom_smooth() + 
@@ -72,8 +72,8 @@ annotate("text", x=quantile(sigma_prior, 0.8), y=min(BF)*2, color="purple", labe
 	}
 
 
-#plotL <- function(y, sig, sig_prior=2, Z=1.96, n_elem=80){
-plotL <- function(y, sig, sig_prior=2, Z=1.96, alpha=5, beta=5, n_elem=80){
+plotL <- function(y, sig, sig_prior=2, Z=1.96, n_elem=80){
+#plotL <- function(y, sig, sig_prior=2, Z=1.96, alpha=5, beta=5, n_elem=80){
 	a <- 0.5 * (sum(1/sig**2) + 1/sig_prior**2)
 	b <- -sum(y/sig**2)
 	var_ <- 1 / (2*a)
@@ -83,16 +83,29 @@ mu_value <- rep(seq(mean_-7*sig_, mean_+7*sig_, length.out=n_elem), n_elem)
 eta_value <- rep(seq(0, 1, length.out=n_elem), each=n_elem)
 results <- as.data.frame(cbind(mu_value, eta_value)); results$L <- NA
 
-#for(k in 1:nrow(results)){ results[k,"L"] <- exp(logL(mu_value[k], eta_value[k], y=y, sig=sig, sig_prior=sig_prior, Z=Z))}
-for(k in 1:nrow(results)){ results[k,"L"] <- exp(logL(mu_value[k], eta_value[k], y=y, sig=sig, sig_prior=sig_prior, Z=Z, alpha=alpha, beta=beta))}
+for(k in 1:nrow(results)){ results[k,"L"] <- exp(logL(mu_value[k], eta_value[k], y=y, sig=sig, sig_prior=sig_prior, Z=Z))}
+#for(k in 1:nrow(results)){ results[k,"L"] <- exp(logL(mu_value[k], eta_value[k], y=y, sig=sig, sig_prior=sig_prior, Z=Z, alpha=alpha, beta=beta))}
 
 #results <- matrix(NA, n_elem, n_elem)
 #	for(k in 1:n_elem){
 #		for(j in 1:n_elem){results[k,j] <- exp(logL(mu_value[k], eta_value[j], y=y, sig=sig, sig_prior=sig_prior, Z=Z))}
 #	}
 
-pl <- ggplot(results, aes(x=mu_value, y=eta_value, z=L, fill=L)) + geom_tile() + scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + scale_fill_distiller(palette = "Spectral")
+pl <- ggplot(results, aes(x=mu_value, y=eta_value, z=L, fill=L)) + geom_tile() + scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + scale_fill_distiller(palette = "Spectral") + theme(legend.position="bottom")
 
 }
+
+
+enhfun <- function(){
+
+layout(matrix(1:2, ncol = 1), widths = 1, heights = c(2,1.5), respect = FALSE)
+par(mar = c(0, 4.1, 4.1, 2.1))
+plot(dat.bangertdrowns2004$yi, dat.bangertdrowns2004$vi)
+par(mar = c(4.1, 4.1, 0, 2.1))
+funnel(rma(yi=dat.bangertdrowns2004$yi, vi=dat.bangertdrowns2004$vi), level=c(90, 95, 99), shade=c("white", "gray", "darkgray"), refline=0)
+
+
+}
+
 
 
