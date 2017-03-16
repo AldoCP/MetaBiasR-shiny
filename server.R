@@ -104,6 +104,12 @@ if(FALSE){
 #    pl
 	})
 
+  output$plot3 <- renderPlot({
+    dataset <- datasetInput()
+	TWOmassPlot(y=dataset$yi, sig=sqrt(dataset$vi))
+	})
+
+
 
   output$view <- renderTable({
     datasetInput()#head(datasetInput(), n = 5)#input$obs)

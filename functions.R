@@ -109,6 +109,31 @@ funnel(rma(yi=x, vi=y), level=c(90, 95, 99), shade=c("white", "gray", "darkgray"
 
 
 }
-enhfun()
+#enhfun()
 
+
+
+TWOmassPlot <- function(y, sig, sig_prior=2){
+  Fn0 <- function(arg) exp(logL0(arg, y=y, sig=sig, sig_prior=sig_prior))
+a <- 0.5 * (sum(1/sig**2) + 1/sig_prior**2)
+b <- -sum(y/sig**2)
+var_ <- 1 / (2*a)
+mean_ <- -var_*b
+sig_ <- sqrt(var_)
+
+range_ <- seq(mean_-10*sig_, mean_+10*sig_, by=sig_/5)
+ans <- rep(NA,length(range_))
+
+
+layout(matrix(1:2, ncol = 1), widths = 1, heights = c(2,2), respect = FALSE)
+par(mar = c(0, 4.1, 4.1, 2.1))
+#plot(range_, ans, xlim=range(y)*1.75, ylim=c(0, 1.5*max(ans)))#ylim=c(max(sqrt(sig**2)),0))
+curve(Fn0, from=mean_-100*sig_, to=mean_+100*sig_, n=10000, xlim=range(y)*1.75, col='red')
+#curve(Fn0, from=mean_-10*sig_, to=mean_+10*sig_, n=10000, xlim=range(y)*1.75, col='blue')
+par(mar = c(4.1, 4.1, 0, 2.1))
+funnel(rma(yi=y, vi=sig**2), level=c(90, 95, 99), shade=c("white", "gray", "darkgray"), refline=0, xlim=range(y)*1.75, ylim=c(max(sqrt(sig**2)),0))
+
+  }
+
+#TWOmassPlot(y=dat.bangertdrowns2004$yi, sig=sqrt(dat.bangertdrowns2004$vi))
 

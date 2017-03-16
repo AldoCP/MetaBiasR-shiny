@@ -47,7 +47,7 @@ if(FALSE){ #comment this section
                    c(Comma=',',
                      Semicolon=';',
                      Tab='\t'),
-                   '\t'),
+                   ','),
       radioButtons('quote', 'Quote',
                    c(None='',
                      'Double Quote'='"',
@@ -84,13 +84,14 @@ if(FALSE){ #comment this section
 ##    tableOutput("view")
 
       tabsetPanel(
-#        tabPanel("Caption", h3(textOutput("caption"))), 
+##        tabPanel("Caption", h3(textOutput("caption"))), 
         tabPanel("Bayes factor", verbatimTextOutput("summary")), 
         tabPanel("BF vs sigma prior", plotlyOutput("plot1")),
         tabPanel("Likelihood", plotlyOutput("plot2")),
-#        tabPanel("BF vs sigma prior", plotOutput("plot1")),
-#        tabPanel("Likelihood", plotOutput("plot2")),
-        tabPanel("Data", tableOutput("view"))
+##        tabPanel("BF vs sigma prior", plotOutput("plot1")),
+##        tabPanel("Likelihood", plotOutput("plot2")),
+        tabPanel("Data", tableOutput("view")),
+        tabPanel("Funnel", plotOutput("plot3", height="800px"))
                  )
 
   )
