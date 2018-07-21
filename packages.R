@@ -1,6 +1,6 @@
 # Inspired by: https://github.com/btubbs/shiny-example-1/raw/master/packages.R
 
-the_packages = c("scales", "metafor", "ggplot2", "plotly") #"MetaBiasR"
+the_packages = c("scales", "metafor", "ggplot2", "plotly", "cubature") #"MetaBiasR"
 
 ###########################################################
 
